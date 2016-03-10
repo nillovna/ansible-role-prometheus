@@ -1,0 +1,12 @@
+# Allow pre-release (beta) versions
+prometheus_pre_release: yes
+
+# TODO: Reinstall if there's a new version
+# prometheus_latest: yes
+
+# will deploy to {{ prometheus_base_dir}}/{{ prometheus_dir }}
+prometheus_base_dir: /opt
+prometheus_dir: prometheus
+
+prometheus_user: prometheus
+prometheus_data_dir: /var/lib/prometheus

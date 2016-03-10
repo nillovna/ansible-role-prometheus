@@ -1,0 +1,12 @@
+# Allow pre-release (beta) versions
+node_exporter_pre_release: yes
+
+# TODO: Reinstall if there's a new version
+# node_exporter_latest: yes
+
+# will deploy to {{ prometheus_base_dir}}/{{ prometheus_dir }}
+node_exporter_base_dir: /opt
+
+node_exporter_data_dir: /var/lib/node_exporter
+
+node_exporter_user: prometheus

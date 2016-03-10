@@ -1,0 +1,61 @@
+- name: install dependencies
+  apt: name={{ item }} update_cache=yes cache_valid_time=86400
+  with_items:
+      - python-httplib2
+
+- name: get list of releases
+  uri:
+      url: https://api.github.com/repos/prometheus/alertmanager/releases
+      return_content: yes
+  register: releases
+  when: alertmanager_pre_release
+
+- name: get latest release
+  uri:
+      url: https://api.github.com/repos/prometheus/alertmanager/releases/latest
+      return_content: yes
+  register: release
+  when: not alertmanager_pre_release
+  
+- name: set release
+  set_fact:
+      github_release: "{{ releases.json[0] if alertmanager_pre_release else release.json }}"
+      
+- name: get package url
+  set_fact:
+      alertmanager_json: "{{ item }}"
+  with_items: github_release.assets
+  when: "'linux-amd64' in item.name"
+
+- name: ensure alertmanager_base_dir and config dir are presented
+  file: dest={{ item }} state=directory
+  with_items:
+      - "{{ alertmanager_base_dir }}"
+      - /etc/alertmanager/
+
+- name: create alertmanager data dir
+  file: dest={{ alertmanager_data_dir }} state=directory owner={{ alertmanager_user }} group={{ alertmanager_user }}
+
+- name: get alertmanager
+  unarchive: src={{ alertmanager_json.browser_download_url }}
+             dest={{ alertmanager_base_dir }} copy=no list_files=yes
+             creates={{ alertmanager_base_dir }}/{{ alertmanager_json.name | replace('.tar.gz','') }}
+             # owner={{ alertmanager_user }} group={{ alertmanager_user }}
+  register: result
+  notify: runit restart alertmanager
+
+- name: make {{ alertmanager_base_dir}}/alertmanager symlink
+  file: state=link src={{ item.src }} dest={{ item.dst }}
+  with_items:
+      - { src: "{{ alertmanager_json.name | replace('.tar.gz','') }}", dst: "{{ alertmanager_base_dir}}/alertmanager" }
+  notify: runit restart alertmanager
+
+- name: check if /etc/alertmanager/alertmanager.yml is presented
+  stat: path=/etc/alertmanager/alertmanager.yml get_md5=no
+  register: alertmanager_conf
+  
+- name: put example alertmanager config file
+  template: dest=/etc/alertmanager/alertmanager.yml src=alertmanager_example.yml
+  when: not alertmanager_conf.stat.exists
+  notify:
+      - runit hup alertmanager

@@ -1,0 +1,11 @@
+- name: prometheus check rules
+  shell: "{{ prometheus_base_dir}}/{{ prometheus_dir }}//promtool check-rules /etc/prometheus/rules/*.conf"
+  register: prometheus_check_rules
+  changed_when: prometheus_check_rules.rc !=0
+  failed_when: no
+  notify: prometheus show errors
+
+- name: prometheus show errors
+  debug: var=prometheus_check_rules.stderr.split('\n')
+  ignore_errors: yes
+  failed_when: yes

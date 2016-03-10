@@ -1,0 +1,72 @@
+- name: install dependencies
+  apt: name={{ item }} update_cache=yes cache_valid_time=86400
+  with_items:
+      - python-httplib2
+
+- name: check if prometheus is already installed and get it's version
+  shell: "{{ prometheus_base_dir}}/{{ prometheus_dir }}/prometheus --version"
+  register: prometheus_installed_version
+  failed_when: no
+  changed_when: prometheus_installed_version.rc != 0
+
+- name: get list of releases
+  uri:
+      url: https://api.github.com/repos/prometheus/prometheus/releases
+      return_content: yes
+  register: releases
+  when: prometheus_pre_release
+
+- name: get latest release
+  uri:
+      url: https://api.github.com/repos/prometheus/prometheus/releases/latest
+      return_content: yes
+  register: release
+  when: not prometheus_pre_release
+  
+- name: set release
+  set_fact:
+      github_release: "{{ releases.json[0] if prometheus_pre_release else release.json }}"
+      
+- name: get package url
+  set_fact:
+      prometheus_json: "{{ item }}"
+  with_items: github_release.assets
+  when: "'linux-amd64' in item.name"
+
+- name: ensure prometheus_base_dir and /etc/prometheus/ are presented
+  file: dest={{ item }} state=directory
+  with_items:
+      - /etc/prometheus/rules/
+      - /etc/prometheus/file_sd_configs
+      - "{{ prometheus_base_dir }}"
+      
+- name: create prometheus data dir
+  file: dest={{ prometheus_data_dir }} state=directory owner={{ prometheus_user }} group={{ prometheus_user }}
+
+- name: get prometheus
+  unarchive: src={{ prometheus_json.browser_download_url }}
+             dest={{ prometheus_base_dir }} copy=no list_files=yes creates={{ prometheus_base_dir }}/{{ prometheus_json.name | replace('.tar.gz','') }}
+             # owner={{ prometheus_user }} group={{ prometheus_user }}
+  register: result
+
+- name: make {{ prometheus_base_dir}}/{{ prometheus_dir }} symlink
+  file: state=link src={{ item.src }} dest={{ item.dst }}
+  with_items:
+      - { src: "{{ result.files[0] }}", dst: "{{ prometheus_base_dir}}/{{ prometheus_dir }}" }
+  when: result.changed
+  notify: runit restart prometheus
+
+- name: make conf symlink
+  file: state=link src={{ item.src }} dest={{ item.dst }}
+  with_items:
+      - { src: "/etc/prometheus/prometheus.yml", dst: "{{ prometheus_base_dir}}/{{ prometheus_dir }}/prometheus.yml" }
+  when: result.changed
+
+- name: put prometeus config files
+  template: dest=/etc/prometheus/{{ item }} src={{ item }}
+  with_items:
+      - prometheus.yml
+  tags: conf
+  notify:
+      - prometheus check rules
+      - runit hup prometheus

@@ -1,0 +1,6 @@
+dependencies:
+    - role: runit
+      runit_service_name: prometheus
+      runit_service_user: "{{ prometheus_user }}"
+      runit_service_command: "/{{ prometheus_base_dir}}/{{ prometheus_dir }}/prometheus"
+      runit_service_params: "-config.file=/etc/prometheus/prometheus.yml -storage.local.path={{ prometheus_data_dir }} -alertmanager.url=http://127.0.0.1:9093"

@@ -1,0 +1,42 @@
+- name: install dependencies
+  apt: name={{ item }} update_cache=yes cache_valid_time=86400
+  with_items:
+      - python-httplib2
+
+- name: get list of releases
+  uri:
+      url: https://api.github.com/repos/prometheus/node_exporter/releases
+      return_content: yes
+  register: releases
+  when: node_exporter_pre_release
+
+- name: get latest release
+  uri:
+      url: https://api.github.com/repos/prometheus/node_exporter/releases/latest
+      return_content: yes
+  register: release
+  when: not node_exporter_pre_release
+  
+- name: set release
+  set_fact:
+      github_release: "{{ releases.json[0] if node_exporter_pre_release else release.json }}"
+      
+- name: get package url
+  set_fact:
+      node_exporter_json: "{{ item }}"
+  with_items: github_release.assets
+  when: "'linux-amd64' in item.name"
+
+- name: ensure node_exporter_base_dir is presented
+  file: dest={{ item }} state=directory
+  with_items:
+      - "{{ node_exporter_base_dir }}"
+
+- name: create node_exporter data dir
+  file: dest={{ node_exporter_data_dir }} state=directory owner={{ node_exporter_user }} group={{ node_exporter_user }}
+
+- name: get node_exporter
+  unarchive: src={{ node_exporter_json.browser_download_url }}
+             dest={{ node_exporter_base_dir }} copy=no
+             creates={{ node_exporter_base_dir }}/node_exporter
+             # owner={{ node_exporter_user }} group={{ node_exporter_user }}

@@ -1,0 +1,12 @@
+# Allow pre-release (beta) versions
+alertmanager_pre_release: yes
+
+# TODO: Reinstall if there's a new version
+# alertmanager_latest: yes
+
+# will deploy to {{ prometheus_base_dir}}/{{ prometheus_dir }}
+alertmanager_base_dir: /opt
+
+alertmanager_data_dir: /var/lib/alertmanager
+
+alertmanager_user: prometheus
