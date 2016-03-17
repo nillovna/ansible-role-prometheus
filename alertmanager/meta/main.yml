@@ -3,4 +3,4 @@ dependencies:
       runit_service_name: alertmanager
       runit_service_user: "{{ alertmanager_user }}"
       runit_service_command: "{{ alertmanager_base_dir }}/alertmanager"
-      runit_service_params: "-config.file=/etc/alertmanager/alertmanager.yml -storage.path={{ alertmanager_data_dir }}"
+      runit_service_params: "-config.file=\"/etc/alertmanager/alertmanager.yml\" -storage.path=\"{{ alertmanager_data_dir }}\" -web.external-url=\"{{ alertmanager_web_external_url }}\""

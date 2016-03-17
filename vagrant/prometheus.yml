@@ -1,0 +1,9 @@
+- hosts: vagrant
+  become: yes
+  become_method: sudo
+  roles:
+    # - prometheus/prometheus
+    # - prometheus/node_exporter
+    # - prometheus/alertmanager
+    # - grafana
+    - example

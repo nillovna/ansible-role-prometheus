@@ -45,7 +45,8 @@
 
 - name: get prometheus
   unarchive: src={{ prometheus_json.browser_download_url }}
-             dest={{ prometheus_base_dir }} copy=no list_files=yes creates={{ prometheus_base_dir }}/{{ prometheus_json.name | replace('.tar.gz','') }}
+             dest={{ prometheus_base_dir }} copy=no list_files=yes
+             # creates={{ prometheus_base_dir }}/{{ prometheus_json.name | replace('.tar.gz','') }}
              # owner={{ prometheus_user }} group={{ prometheus_user }}
   register: result
 
@@ -56,12 +57,6 @@
   when: result.changed
   notify: runit restart prometheus
 
-- name: make conf symlink
-  file: state=link src={{ item.src }} dest={{ item.dst }}
-  with_items:
-      - { src: "/etc/prometheus/prometheus.yml", dst: "{{ prometheus_base_dir}}/{{ prometheus_dir }}/prometheus.yml" }
-  when: result.changed
-
 - name: put prometeus config files
   template: dest=/etc/prometheus/{{ item }} src={{ item }}
   with_items:
@@ -70,3 +65,9 @@
   notify:
       - prometheus check rules
       - runit hup prometheus
+
+- name: make conf symlink
+  file: state=link src={{ item.src }} dest={{ item.dst }}
+  with_items:
+      - { src: "/etc/prometheus/prometheus.yml", dst: "{{ prometheus_base_dir}}/{{ prometheus_dir }}/prometheus.yml" }
+  when: result.changed

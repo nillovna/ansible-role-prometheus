@@ -3,4 +3,4 @@ dependencies:
       runit_service_name: node_exporter
       runit_service_user: "{{ node_exporter_user }}"
       runit_service_command: "{{ node_exporter_base_dir }}/node_exporter"
-      runit_service_params: "--collector.textfile.directory={{ node_exporter_data_dir }}"
+      runit_service_params: "--collector.textfile.directory={{ node_exporter_data_dir }} -collectors.enabled=\"{{ node_exporter_collectors|join(',') }}\""

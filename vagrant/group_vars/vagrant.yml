@@ -1,16 +1,3 @@
-# Allow pre-release (beta) versions
-node_exporter_pre_release: yes
-
-# TODO: Reinstall if there's a new version
-# node_exporter_latest: yes
-
-# will deploy to {{ node_exporter_base_dir }}/node_exporter
-node_exporter_base_dir: /opt
-
-node_exporter_data_dir: /var/lib/node_exporter
-
-node_exporter_user: prometheus
-
 node_exporter_collectors:
     - conntrack
     - diskstats
@@ -40,7 +27,7 @@ node_exporter_collectors:
     # - megacli
     # - meminfo_numa
     # - ntp
-    # - runit
+    - runit
     # - supervisord
     # - systemd
     # - tcpstat
