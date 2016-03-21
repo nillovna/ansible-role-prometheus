@@ -62,6 +62,7 @@
   with_items:
       - prometheus.yml
   tags: conf
+  when: ! prometheus_no_conf
   notify:
       - prometheus check rules
       - runit hup prometheus
