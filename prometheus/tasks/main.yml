@@ -55,7 +55,7 @@
   with_items:
       - { src: "{{ result.files[0] }}", dst: "{{ prometheus_base_dir}}/{{ prometheus_dir }}" }
   when: result.changed
-  notify: runit restart prometheus
+  notify: restart prometheus
 
 - name: put prometeus config files
   template: dest=/etc/prometheus/{{ item }} src={{ item }}
@@ -65,7 +65,7 @@
   when: ! prometheus_no_conf
   notify:
       - prometheus check rules
-      - runit hup prometheus
+      - reload prometheus
 
 - name: make conf symlink
   file: state=link src={{ item.src }} dest={{ item.dst }}

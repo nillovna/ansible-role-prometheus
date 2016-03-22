@@ -1,15 +1,4 @@
-- name: prometheus check rules
-  shell: "{{ prometheus_base_dir}}/{{ prometheus_dir }}//promtool check-rules /etc/prometheus/rules/*.conf"
-  register: prometheus_check_rules
-  changed_when: prometheus_check_rules.rc !=0
-  failed_when: no
-  notify: prometheus show errors
-
-- name: prometheus show errors
-  debug: var=prometheus_check_rules.stderr.split('\n')
-  ignore_errors: yes
-  failed_when: yes
-
+---
 - name: restart {{ runit_service_name }}
   debug: msg="restarting {{ runit_service_name }} with {{ prometheus_supervisor }}"
   changed_when: true

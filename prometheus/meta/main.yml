@@ -4,3 +4,13 @@ dependencies:
       runit_service_user: "{{ prometheus_user }}"
       runit_service_command: "/{{ prometheus_base_dir}}/{{ prometheus_dir }}/prometheus"
       runit_service_params: "-config.file=/etc/prometheus/prometheus.yml -storage.local.path={{ prometheus_data_dir }} -alertmanager.url=http://127.0.0.1:9093"
+      when: prometheus_supervisor == "runit"
+
+    - role: systemd
+      systemd_service_name: prometheus
+      systemd_service_user: "{{ prometheus_user }}"
+      systemd_service_command: "/{{ prometheus_base_dir}}/{{ prometheus_dir }}/prometheus"
+      systemd_service_params: "-config.file=/etc/prometheus/prometheus.yml -storage.local.path={{ prometheus_data_dir }} -alertmanager.url=http://127.0.0.1:9093"
+      systemd_service_config: /etc/prometheus/prometheus.yml
+      # systemd_service_workdir: "{{ prometheus_data_dir }}"
+      when: prometheus_supervisor == "systemd"

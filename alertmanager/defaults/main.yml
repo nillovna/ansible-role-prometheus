@@ -1,3 +1,5 @@
+prometheus_supervisor: runit
+
 # Allow pre-release (beta) versions
 alertmanager_pre_release: yes
 

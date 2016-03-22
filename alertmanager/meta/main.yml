@@ -4,3 +4,12 @@ dependencies:
       runit_service_user: "{{ alertmanager_user }}"
       runit_service_command: "{{ alertmanager_base_dir }}/alertmanager"
       runit_service_params: "-config.file=\"/etc/alertmanager/alertmanager.yml\" -storage.path=\"{{ alertmanager_data_dir }}\" -web.external-url=\"{{ alertmanager_web_external_url }}\""
+      when: prometheus_supervisor == "runit"
+      
+    - role: systemd
+      systemd_service_name: alertmanager
+      systemd_service_user: "{{ alertmanager_user }}"
+      systemd_service_command: "{{ alertmanager_base_dir }}/alertmanager"
+      systemd_service_params: "-config.file=\"/etc/alertmanager/alertmanager.yml\" -storage.path=\"{{ alertmanager_data_dir }}\" -web.external-url=\"{{ alertmanager_web_external_url }}\""
+      systemd_service_config: /etc/alertmanager/alertmanager.yml
+      when: prometheus_supervisor == "systemd"
