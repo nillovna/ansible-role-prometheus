@@ -16,6 +16,8 @@ prometheus_data_dir: /var/lib/prometheus
 
 prometheus_no_conf: no
 
+prometheus_storage_local_retention: 360h0m0s
+
 prometheus_conf:
     global:
       scrape_interval:     15s # By default, scrape targets every 15 seconds.
