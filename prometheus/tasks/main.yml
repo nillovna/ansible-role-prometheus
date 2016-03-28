@@ -62,7 +62,7 @@
   with_items:
       - prometheus.yml
   tags: conf
-  when: ! prometheus_no_conf
+  when: not prometheus_no_conf
   notify:
       - prometheus check rules
       - reload prometheus
