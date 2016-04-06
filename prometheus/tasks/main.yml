@@ -66,9 +66,3 @@
   notify:
       - prometheus check rules
       - reload prometheus
-
-- name: make conf symlink
-  file: state=link src={{ item.src }} dest={{ item.dst }}
-  with_items:
-      - { src: "/etc/prometheus/prometheus.yml", dst: "{{ prometheus_base_dir}}/{{ prometheus_dir }}/prometheus.yml" }
-  when: result.changed
