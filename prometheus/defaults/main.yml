@@ -16,6 +16,8 @@ prometheus_data_dir: /var/lib/prometheus
 
 prometheus_no_conf: no
 
+prometheus_alertmanager_url: http://127.0.0.1:9093
+
 prometheus_storage_local_retention: 360h0m0s
 
 prometheus_conf:
