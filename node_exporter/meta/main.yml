@@ -35,7 +35,8 @@ dependencies:
               {%- if node_exporter_collector_supervisord  and collectors.append('supervisord' ) -%}{%- endif -%}
               {%- if node_exporter_collector_systemd      and collectors.append('systemd'     ) -%}{%- endif -%}
               {%- if node_exporter_collector_tcpstat      and collectors.append('tcpstat'     ) -%}{%- endif -%}
-              {{ collectors|join(',') }}\""
+              {{ collectors|join(',') }}\"
+              {%- if node_exporter_collector_megacli %} -collector.megacli.command=\"{{ node_exporter_collector_megacli_command }}\"{% endif %}"
       when: prometheus_supervisor == "runit"
 
     - role: systemd
@@ -74,5 +75,6 @@ dependencies:
               {%- if node_exporter_collector_supervisord  and collectors.append('supervisord' ) -%}{%- endif -%}
               {%- if node_exporter_collector_systemd      and collectors.append('systemd'     ) -%}{%- endif -%}
               {%- if node_exporter_collector_tcpstat      and collectors.append('tcpstat'     ) -%}{%- endif -%}
-              {{ collectors|join(',') }}\""
+              {{ collectors|join(',') }}\"
+              {%- if node_exporter_collector_megacli %} -collector.megacli.command=\"{{ node_exporter_collector_megacli_command }}\"{% endif %}"
       when: prometheus_supervisor == "systemd"
