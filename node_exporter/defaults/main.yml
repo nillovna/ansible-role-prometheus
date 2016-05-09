@@ -45,4 +45,4 @@ node_exporter_collector_supervisord: no
 node_exporter_collector_systemd: no
 node_exporter_collector_tcpstat: no
 
-node_exporter_collector_megacli_command: "sudo megacli"
+node_exporter_collector_megacli_command: "megacli"
