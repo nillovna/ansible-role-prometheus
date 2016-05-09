@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+global:
+    external_labels:
+        monitor: prometheus
+    scrape_interval: 15s
+
+rule_files:
+- /etc/prometheus/rules/*.conf
+
+scrape_configs:
+-   file_sd_configs:
+    -   names:
+        - /etc/prometheus/file_sd_configs/*.yml
+    job_name: prometheus
+    scrape_interval: 5s
+    target_groups:
+    -   targets:
+        - localhost:9090

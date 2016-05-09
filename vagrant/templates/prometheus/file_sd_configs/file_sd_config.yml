@@ -1,0 +1,20 @@
+- targets:
+  - localhost:9100
+  labels:
+    job: node
+
+- targets:
+  - localhost:9091
+  labels:
+    job: pushed
+
+- targets:
+  - localhost:9126
+  labels:
+    job: telegraf
+    
+- targets:
+  - localhost:9125
+  labels:
+    job: statsd
+    

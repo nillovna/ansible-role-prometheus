@@ -1,4 +1,0 @@
-- targets:
-  - localhost:9100
-  labels:
-    job: system

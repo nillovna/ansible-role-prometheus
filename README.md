@@ -2,7 +2,7 @@
 
 **Role is in active development, some naming conveniences could be changed.**
 
-This is a set of roles that currently include [prometheus](https://github.com/prometheus/prometheus),[alertmanager](https://github.com/prometheus/alertmanager) and [node_exporter](https://github.com/prometheus/node_exporter).
+This is a set of roles that currently include [prometheus](https://github.com/prometheus/prometheus),[alertmanager](https://github.com/prometheus/alertmanager), [node_exporter](https://github.com/prometheus/node_exporter) and [pushgateway](https://github.com/prometheus/pushgateway).
 
 All of the executables have lots of command line and config options, if you miss any just add it and ensure to updated role defaults with the dafault values, PRs are welcomed.
 

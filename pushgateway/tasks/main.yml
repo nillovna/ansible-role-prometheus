@@ -1,0 +1,42 @@
+- name: install dependencies
+  apt: name={{ item }} update_cache=yes cache_valid_time=86400
+  with_items:
+      - python-httplib2
+
+- name: get list of releases
+  uri:
+      url: https://api.github.com/repos/prometheus/pushgateway/releases
+      return_content: yes
+  register: releases
+  when: pushgateway_pre_release
+
+- name: get latest release
+  uri:
+      url: https://api.github.com/repos/prometheus/pushgateway/releases/latest
+      return_content: yes
+  register: release
+  when: not pushgateway_pre_release
+  
+- name: set release
+  set_fact:
+      github_release: "{{ releases.json[0] if pushgateway_pre_release else release.json }}"
+      
+- name: get package url
+  set_fact:
+      pushgateway_json: "{{ item }}"
+  with_items: github_release.assets
+  when: "'linux-amd64' in item.name"
+
+- name: ensure pushgateway_base_dir is presented
+  file: dest={{ item }} state=directory
+  with_items:
+      - "{{ pushgateway_base_dir }}"
+
+- name: create pushgateway data dir
+  file: dest={{ pushgateway_data_dir }} state=directory owner={{ pushgateway_user }} group={{ pushgateway_user }}
+
+- name: get pushgateway
+  unarchive: src={{ pushgateway_json.browser_download_url }}
+             dest={{ pushgateway_base_dir }} copy=no list_files=yes
+             creates={{ pushgateway_base_dir }}/pushgateway
+  notify: restart pushgateway

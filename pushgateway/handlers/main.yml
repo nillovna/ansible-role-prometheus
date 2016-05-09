@@ -1,0 +1,10 @@
+---
+- name: restart {{ runit_service_name }}
+  debug: msg="restarting {{ runit_service_name }} with {{ prometheus_supervisor }}"
+  changed_when: true
+  notify: "{{ prometheus_supervisor }} restart {{ runit_service_name }}"
+
+- name: reload {{ runit_service_name }}
+  debug: msg="reloading {{ runit_service_name }} with {{ prometheus_supervisor }}"
+  changed_when: true
+  notify: "{{ prometheus_supervisor }} reload {{ runit_service_name }}"

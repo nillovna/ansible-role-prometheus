@@ -1,4 +1,6 @@
 dependencies:
-    - prometheus/prometheus
+    - role: prometheus/prometheus
+      prometheus_no_conf: yes
+      tags: prometheus
     - prometheus/node_exporter
     - prometheus/alertmanager

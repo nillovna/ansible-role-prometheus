@@ -1,0 +1,14 @@
+dependencies:
+    - role: runit
+      runit_service_name: pushgateway
+      runit_service_user: "{{ pushgateway_user }}"
+      runit_service_command: "{{ pushgateway_base_dir }}/pushgateway"
+      runit_service_params: "-persistence.file {{ pushgateway_persistence_file }} -web.listen-address {{ pushgateway_listen_address }}"
+      when: prometheus_supervisor == "runit"
+      
+    - role: systemd
+      systemd_service_name: pushgateway
+      systemd_service_user: "{{ pushgateway_user }}"
+      systemd_service_command: "{{ pushgateway_base_dir }}/pushgateway"
+      systemd_service_params: "-persistence.file {{ pushgateway_persistence_file }} -web.listen-address {{ pushgateway_listen_address }}"
+      when: prometheus_supervisor == "systemd"

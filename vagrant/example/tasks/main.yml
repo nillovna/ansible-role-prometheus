@@ -1,14 +1,48 @@
+- name: get list of local config files
+  shell: find . -type f chdir=templates/prometheus/
+  register: list_local
+  become: no
+  connection: local
+  changed_when: no
+  tags: monconf
+
+- name: get list of local directories
+  shell: find . -type d chdir=templates/prometheus/
+  register: list_config_dirs
+  become: no
+  connection: local
+  changed_when: no
+  tags: monconf
+  
+- name: create required dirs
+  file: dest=/etc/prometheus/{{ item }} state=directory
+  with_items: "{{ list_config_dirs.stdout_lines }}"
+  tags: monconf
+  
+- name: get list of remote config files
+  shell: find . -type f chdir=/etc/prometheus/
+  register: list_remote
+  changed_when: no
+  tags: monconf
+  
 - name: put prometeus config files
-  template: dest=/etc/prometheus/{{ item }} src={{ item }}
-  with_items:
-      - file_sd_configs/file_sd_config.yml
-      - rules/rules.conf
-  tags: conf
+  template: dest=/etc/prometheus/{{ item }} src=prometheus/{{ item }}
+  with_items: "{{ list_local.stdout_lines }}"
+  tags: monconf
   notify:
       - prometheus check rules
-      - runit hup prometheus
+      - reload prometheus
+
+- name: remove remote configs not presented locally
+  file: dest=/etc/prometheus/{{ item }} state=absent
+  with_items: "{{ list_remote.stdout_lines|difference(list_local.stdout_lines) }}"
+  tags: monconf
+  notify:
+      - prometheus check rules
+      - reload prometheus      
 
 - name: put alertmanager config file
   template: dest=/etc/alertmanager/alertmanager.yml src=alertmanager/alertmanager.yml
   notify:
-      - runit hup alertmanager
+      - reload alertmanager
+  tags: monconf

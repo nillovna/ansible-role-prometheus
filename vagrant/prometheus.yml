@@ -6,4 +6,6 @@
     # - prometheus/node_exporter
     # - prometheus/alertmanager
     # - grafana
+    # - prometheus/pushgateway
     - example
+    

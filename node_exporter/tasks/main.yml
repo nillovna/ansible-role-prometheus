@@ -39,4 +39,3 @@
   unarchive: src={{ node_exporter_json.browser_download_url }}
              dest={{ node_exporter_base_dir }} copy=no
              creates={{ node_exporter_base_dir }}/node_exporter
-             # owner={{ node_exporter_user }} group={{ node_exporter_user }}

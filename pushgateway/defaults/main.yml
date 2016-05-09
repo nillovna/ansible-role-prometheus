@@ -1,0 +1,16 @@
+prometheus_supervisor: runit
+
+# Allow pre-release (beta) versions
+pushgateway_pre_release: yes
+
+# TODO: Reinstall if there's a new version
+# pushgateway_latest: yes
+
+# will deploy to {{ prometheus_base_dir}}/{{ prometheus_dir }}
+pushgateway_base_dir: /opt
+
+pushgateway_data_dir: /var/lib/pushgateway
+
+pushgateway_user: prometheus
+pushgateway_listen_address: ":9091"
+pushgateway_persistence_file: "{{ pushgateway_data_dir }}/persistence.bin"
