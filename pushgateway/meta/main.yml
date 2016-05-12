@@ -5,6 +5,7 @@ dependencies:
       runit_service_command: "{{ pushgateway_base_dir }}/pushgateway"
       runit_service_params: "-persistence.file {{ pushgateway_persistence_file }} -web.listen-address {{ pushgateway_listen_address }}"
       when: prometheus_supervisor == "runit"
+      tags: runit
       
     - role: systemd
       systemd_service_name: pushgateway

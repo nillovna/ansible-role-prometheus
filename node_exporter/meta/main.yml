@@ -38,6 +38,7 @@ dependencies:
               {{ collectors|join(',') }}\"
               {%- if node_exporter_collector_megacli %} -collector.megacli.command=\"{{ node_exporter_base_dir }}/sudo_megacli.sh\"{% endif %}"
       when: prometheus_supervisor == "runit"
+      tags: runit
 
     - role: systemd
       systemd_service_name: node_exporter

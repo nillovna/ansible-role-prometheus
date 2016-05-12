@@ -5,6 +5,7 @@ dependencies:
       runit_service_command: "{{ alertmanager_base_dir }}/alertmanager/alertmanager"
       runit_service_params: "-config.file=\"/etc/alertmanager/alertmanager.yml\" -storage.path=\"{{ alertmanager_data_dir }}\" -web.external-url=\"{{ alertmanager_web_external_url }}\""
       when: prometheus_supervisor == "runit"
+      tags: runit
       
     - role: systemd
       systemd_service_name: alertmanager
