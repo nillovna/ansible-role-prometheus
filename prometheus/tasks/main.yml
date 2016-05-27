@@ -14,18 +14,25 @@
       url: https://api.github.com/repos/prometheus/prometheus/releases
       return_content: yes
   register: releases
-  when: prometheus_pre_release
+  when: prometheus_pre_release or prometheus_specific_release_tag_name
 
 - name: get latest release
   uri:
       url: https://api.github.com/repos/prometheus/prometheus/releases/latest
       return_content: yes
   register: release
-  when: not prometheus_pre_release
+  when: not prometheus_pre_release and not prometheus_specific_release_tag_name
   
 - name: set release
   set_fact:
       github_release: "{{ releases.json[0] if prometheus_pre_release else release.json }}"
+  when: not prometheus_specific_release_tag_name
+  
+- name: set release for a tag
+  set_fact:
+      github_release: "{{ item }}"
+  with_items: "{{ releases.json }}"
+  when: "{{ prometheus_specific_release_tag_name and item.tag_name == prometheus_specific_release_tag_name }}"
       
 - name: get package url
   set_fact:

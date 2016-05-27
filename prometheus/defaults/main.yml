@@ -7,6 +7,9 @@ prometheus_pre_release: yes
 # TODO: Reinstall if there's a new version
 # prometheus_latest: yes
 
+# can be no (false) or version
+prometheus_specific_release_tag_name: no
+
 # will deploy to {{ prometheus_base_dir}}/{{ prometheus_dir }}
 prometheus_base_dir: /opt
 prometheus_dir: prometheus

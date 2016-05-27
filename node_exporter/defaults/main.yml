@@ -28,7 +28,6 @@ node_exporter_collector_stat: yes
 node_exporter_collector_textfile: yes
 node_exporter_collector_time: yes
 node_exporter_collector_uname: yes
-node_exporter_collector_version: yes
 node_exporter_collector_vmstat: yes
 node_exporter_collector_bonding: no
 node_exporter_collector_devstat: no

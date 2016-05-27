@@ -45,5 +45,12 @@
 
 - name: get node_exporter
   unarchive: src={{ node_exporter_json.browser_download_url }}
-             dest={{ node_exporter_base_dir }} copy=no
-             creates={{ node_exporter_base_dir }}/node_exporter
+             dest={{ node_exporter_base_dir }} copy=no list_files=yes
+  register: result
+
+- name: make {{ node_exporter_base_dir }}/node_exporter symlink
+  file: state=link src={{ item.src }} dest={{ item.dst }}
+  with_items:
+      - { src: "{{ result.files[0] }}/node_exporter", dst: "{{ node_exporter_base_dir }}/node_exporter" }
+  when: result.changed
+  notify: restart node_exporter

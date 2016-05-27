@@ -19,7 +19,6 @@ dependencies:
               {%- if node_exporter_collector_textfile     and collectors.append('textfile'    ) -%}{%- endif -%}
               {%- if node_exporter_collector_time         and collectors.append('time'        ) -%}{%- endif -%}
               {%- if node_exporter_collector_uname        and collectors.append('uname'       ) -%}{%- endif -%}
-              {%- if node_exporter_collector_version      and collectors.append('version'     ) -%}{%- endif -%}
               {%- if node_exporter_collector_vmstat       and collectors.append('vmstat'      ) -%}{%- endif -%}
               {%- if node_exporter_collector_bonding      and collectors.append('bonding'     ) -%}{%- endif -%}
               {%- if node_exporter_collector_devstat      and collectors.append('devstat'     ) -%}{%- endif -%}
@@ -60,7 +59,6 @@ dependencies:
               {%- if node_exporter_collector_textfile     and collectors.append('textfile'    ) -%}{%- endif -%}
               {%- if node_exporter_collector_time         and collectors.append('time'        ) -%}{%- endif -%}
               {%- if node_exporter_collector_uname        and collectors.append('uname'       ) -%}{%- endif -%}
-              {%- if node_exporter_collector_version      and collectors.append('version'     ) -%}{%- endif -%}
               {%- if node_exporter_collector_vmstat       and collectors.append('vmstat'      ) -%}{%- endif -%}
               {%- if node_exporter_collector_bonding      and collectors.append('bonding'     ) -%}{%- endif -%}
               {%- if node_exporter_collector_devstat      and collectors.append('devstat'     ) -%}{%- endif -%}
