@@ -43,14 +43,20 @@
 - name: create node_exporter data dir
   file: dest={{ node_exporter_data_dir }} state=directory owner={{ node_exporter_user }} group={{ node_exporter_user }} mode=1777
 
+- name: get {{ node_exporter_base_dir }}/node_exporter stats
+  stat: path={{ node_exporter_base_dir }}/node_exporter
+  register: stats
+  
+- name: backup {{ node_exporter_base_dir }}/node_exporter if it exists and not a symlink
+  shell: bash -c "mv {{ node_exporter_base_dir }}/node_exporter {{ node_exporter_base_dir }}/node_exporter_$(date '+%Y_%m_%d_%H_%M_%S')"
+  when: "{{ stats.stat.exists and not stats.stat.islnk }}"
+
 - name: get node_exporter
   unarchive: src={{ node_exporter_json.browser_download_url }}
              dest={{ node_exporter_base_dir }} copy=no list_files=yes
   register: result
 
 - name: make {{ node_exporter_base_dir }}/node_exporter symlink
-  file: state=link src={{ item.src }} dest={{ item.dst }}
-  with_items:
-      - { src: "{{ result.files[0] }}/node_exporter", dst: "{{ node_exporter_base_dir }}/node_exporter" }
+  file: state=link src="{{ result.files[0] }}/node_exporter" dest="{{ node_exporter_base_dir }}/node_exporter"
   when: result.changed
   notify: restart node_exporter
