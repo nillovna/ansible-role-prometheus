@@ -52,6 +52,10 @@
   when: "{{ stats.stat.exists and not stats.stat.islnk }}"
 
 - name: get node_exporter
+  get_url: url={{ node_exporter_json.browser_download_url }}
+           dest={{ node_exporter_base_dir }}
+
+- name: get node_exporter
   unarchive: src={{ node_exporter_json.browser_download_url }}
              dest={{ node_exporter_base_dir }} copy=no list_files=yes
   register: result
