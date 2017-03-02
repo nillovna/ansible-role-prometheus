@@ -1,0 +1,74 @@
+- name: install dependencies
+  apt: name={{ item }} update_cache=yes cache_valid_time=86400
+  with_items:
+      - python-httplib2
+      - python-mysqldb
+      - mysql-server
+      
+- name: add prometheus user to mysql
+  mysql_user:
+    name: "{{ mysqld_exporter_user }}"
+    host: localhost
+    password: "{{ mysql_passwd }}"
+    priv: "{{ item }}"
+    append_privs: yes
+    state: present
+  with_items:
+      - "*.*:PROCESS"
+      - "*.*:REPLICATION CLIENT"
+      - "performance_schema.*:SELECT"
+    
+- name: create .my.cnf for {{ mysqld_exporter_user }}
+  template: src={{ item }} dest=/home/{{ mysqld_exporter_user }}/.{{ item }} owner={{ mysqld_exporter_user }} group={{ mysqld_exporter_user }} mode=0600  
+  with_items:
+    - my.cnf
+    
+- name: get list of releases
+  uri:
+      url: https://api.github.com/repos/prometheus/mysqld_exporter/releases
+      return_content: yes
+  register: releases
+  when: mysqld_exporter_pre_release
+
+- name: get latest release
+  uri:
+      url: https://api.github.com/repos/prometheus/mysqld_exporter/releases/latest
+      return_content: yes
+  register: release
+  when: not mysqld_exporter_pre_release
+  
+- name: set release
+  set_fact:
+      github_release: "{{ releases.json[0] if mysqld_exporter_pre_release else release.json }}"
+      
+- name: get package url
+  set_fact:
+      mysqld_exporter_json: "{{ item }}"
+  with_items: github_release.assets
+  when: "'linux-amd64' in item.name"
+
+- name: ensure mysqld_exporter_base_dir is presented
+  file: dest={{ item }} state=directory
+  with_items:
+      - "{{ mysqld_exporter_base_dir }}"
+
+- name: create mysqld_exporter data dir
+  file: dest={{ mysqld_exporter_data_dir }} state=directory owner={{ mysqld_exporter_user }} group={{ mysqld_exporter_user }} mode=1777
+
+- name: get {{ mysqld_exporter_base_dir }}/mysqld_exporter stats
+  stat: path={{ mysqld_exporter_base_dir }}/mysqld_exporter
+  register: stats
+  
+- name: backup {{ mysqld_exporter_base_dir }}/mysqld_exporter if it exists and not a symlink
+  shell: bash -c "mv {{ mysqld_exporter_base_dir }}/mysqld_exporter {{ mysqld_exporter_base_dir }}/mysqld_exporter_$(date '+%Y_%m_%d_%H_%M_%S')"
+  when: "{{ stats.stat.exists and not stats.stat.islnk }}"
+
+- name: get mysqld_exporter
+  unarchive: src={{ mysqld_exporter_json.browser_download_url }}
+             dest={{ mysqld_exporter_base_dir }} copy=no list_files=yes
+  register: result
+
+- name: make {{ mysqld_exporter_base_dir }}/mysqld_exporter symlink
+  file: state=link src="{{ result.files[0] }}/mysqld_exporter" dest="{{ mysqld_exporter_base_dir }}/mysqld_exporter"
+  when: result.changed
+  notify: restart mysqld_exporter

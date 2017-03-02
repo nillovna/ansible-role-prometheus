@@ -1,0 +1,14 @@
+prometheus_supervisor: runit
+
+# Allow pre-release (beta) versions
+statsd_exporter_pre_release: yes
+
+# TODO: Reinstall if there's a new version
+# statsd_exporter_latest: yes
+
+# will deploy to {{ statsd_exporter_base_dir }}/statsd_exporter
+statsd_exporter_base_dir: /opt
+
+statsd_exporter_data_dir: /var/lib/statsd_exporter
+
+statsd_exporter_user: prometheus

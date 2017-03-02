@@ -1,0 +1,12 @@
+dependencies:
+    - role: runit
+      runit_service_name: statsd_exporter
+      runit_service_user: "{{ statsd_exporter_user }}"
+      runit_service_command: "{{ statsd_exporter_base_dir }}/statsd_exporter"
+      when: prometheus_supervisor == "runit"
+
+    - role: systemd
+      systemd_service_name: statsd_exporter
+      systemd_service_user: "{{ statsd_exporter_user }}"
+      systemd_service_command: "{{ statsd_exporter_base_dir }}/statsd_exporter"
+      when: prometheus_supervisor == "systemd"

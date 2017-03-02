@@ -1,0 +1,42 @@
+prometheus_supervisor: runit
+
+# Allow pre-release (beta) versions
+mysqld_exporter_pre_release: yes
+
+# TODO: Reinstall if there's a new version
+# mysqld_exporter_latest: yes
+
+# will deploy to {{ mysqld_exporter_base_dir }}/mysqld_exporter
+mysqld_exporter_base_dir: /opt
+
+mysqld_exporter_data_dir: /var/lib/mysqld_exporter
+
+mysqld_exporter_user: prometheus
+
+mysqld_exporter_collect: 
+   auto_increment_columns: yes 
+   binlog_size: yes
+   engine_innodb_status: yes
+   engine_tokudb_status: no
+   global_status: yes
+   slave_status: yes
+   global_variables: yes
+   info_schema: 
+      clientstats: yes
+      innodb_metrics: yes
+      innodb_tablespaces: yes
+      processlist: yes
+      query_response_time: yes
+      tables: yes
+      tables_databases: '*'
+      tablestats: yes
+      userstats: yes
+   perf_schema: 
+      eventsstatements: yes
+      eventswaits: yes
+      file_events: yes
+      indexiowaits: yes
+      tableiowaits: yes
+      tablelocks: yes
+      
+mysql_passwd: "{{ lookup('password', '~/' + '/mysqlpassword length=15') }}"

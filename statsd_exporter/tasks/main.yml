@@ -1,0 +1,53 @@
+- name: get list of releases
+  uri:
+      url: https://api.github.com/repos/prometheus/statsd_exporter/releases
+      return_content: yes
+  register: releases
+  when: statsd_exporter_pre_release
+
+- name: get latest release
+  uri:
+      url: https://api.github.com/repos/prometheus/statsd_exporter/releases/latest
+      return_content: yes
+  register: release
+  when: not statsd_exporter_pre_release
+  
+- name: set release
+  set_fact:
+      github_release: "{{ releases.json[0] if statsd_exporter_pre_release else release.json }}"
+      
+- name: get package url
+  set_fact:
+      statsd_exporter_json: "{{ item }}"
+  with_items: github_release.assets
+  when: "'linux-amd64' in item.name"
+
+- name: ensure statsd_exporter_base_dir is presented
+  file: dest={{ item }} state=directory
+  with_items:
+      - "{{ statsd_exporter_base_dir }}"
+
+- name: create statsd_exporter data dir
+  file: dest={{ statsd_exporter_data_dir }} state=directory owner={{ statsd_exporter_user }} group={{ statsd_exporter_user }}
+
+- name: get {{ statsd_exporter_base_dir }}/statsd_exporter stats
+  stat: path={{ statsd_exporter_base_dir }}/statsd_exporter
+  register: stats
+
+- name: backup {{ statsd_exporter_base_dir }}/statsd_exporter if it exists and not a symlink
+  shell: bash -c "mv {{ statsd_exporter_base_dir }}/statsd_exporter {{ statsd_exporter_base_dir }}/statsd_exporter_$(date '+%Y_%m_%d_%H_%M_%S')"
+  when: "{{ stats.stat.exists and not stats.stat.islnk }}"
+
+- name: get statsd_exporter
+  get_url: url={{ statsd_exporter_json.browser_download_url }}
+           dest={{ statsd_exporter_base_dir }}
+
+- name: get statsd_exporter
+  unarchive: src={{ statsd_exporter_json.browser_download_url }}
+             dest={{ statsd_exporter_base_dir }} copy=no list_files=yes
+  register: result
+
+- name: make {{ statsd_exporter_base_dir }}/statsd_exporter symlink
+  file: state=link src="{{ result.files[0] }}/statsd_exporter" dest="{{ statsd_exporter_base_dir }}/statsd_exporter"
+  when: result.changed
+  notify: restart statsd_exporter

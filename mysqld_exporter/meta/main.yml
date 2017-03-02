@@ -1,0 +1,69 @@
+dependencies:
+    - role: runit
+      runit_service_name: mysqld_exporter
+      runit_service_user: "{{ mysqld_exporter_user }}"
+      runit_service_command: "{{ mysqld_exporter_base_dir }}/mysqld_exporter"
+      runit_service_params: "--config.my-cnf=/home/prometheus/.my.cnf --{%- set collectors = [] -%} 
+              {%- if mysqld_exporter_collect.auto_increment_columns          and collectors.append('collect.auto_increment.columns '         ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.binlog_size                     and collectors.append('collect.binlog_size '                    ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.engine_innodb_status            and collectors.append('collect.engine_innodb_status '           ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.engine_tokudb_status            and collectors.append('collect.engine_tokudb_status '           ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.global_status                   and collectors.append('collect.global_status '                  ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.global_variables                and collectors.append('collect.global_variables '               ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.clientstats         and collectors.append('collect.info_schema.clientstats '        ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.innodb_metrics      and collectors.append('collect.info_schema.innodb_metrics '     ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.innodb_tablespaces  and collectors.append('collect.info_schema.innodb_tablespaces ' ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.processlist         and collectors.append('collect.info_schema.processlist '        ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.query_response_time and collectors.append('collect.info_schema.query_response_time ') -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.tables              and collectors.append('collect.info_schema.tables '             ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.tablestats          and collectors.append('collect.info_schema.tablestats '         ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.userstats           and collectors.append('collect.info_schema.userstats '          ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventsstatements    and collectors.append('collect.perf_schema.eventsstatements '   ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventswaits         and collectors.append('collect.perf_schema.eventswaits '        ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.file_events         and collectors.append('collect.perf_schema.file_events '        ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.indexiowaits        and collectors.append('collect.perf_schema.indexiowaits '       ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.tableiowaits        and collectors.append('collect.perf_schema.tableiowaits '       ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.tablelocks          and collectors.append('collect.perf_schema.tablelocks '         ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.slave_status                    and collectors.append('collect.slave_status '                   ) -%}{%- endif -%}
+              {{ collectors|join(' --') }}
+              {%- if mysqld_exporter_collect.info_schema.tables_databases is defined                       -%} --collect.info_schema.tables.databases=\'{{ mysqld_exporter_collect.info_schema.tables_databases }}\'                                 {%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.processlist.min_time is defined                   -%} --collect.info_schema.processlist.min_time={{ mysqld_exporter_collect.info_schema.processlist.min_time }}                             {%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventsstatements.digest_text_limit is defined     -%} --collect.perf_schema.eventsstatements.digest_text_limit={{ mysqld_exporter_collect.perf_schema.eventsstatements.digest_text_limit }} {%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventsstatements.limit is defined                 -%} --collect.perf_schema.eventsstatements.limit={{ mysqld_exporter_collect.perf_schema.eventsstatements.limit }}                         {%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventsstatements.timelimit is defined             -%} --collect.perf_schema.eventsstatements.timelimit={{ mysqld_exporter_collect.perf_schema.eventsstatements.timelimit }}                 {%- endif -%}"
+      when: prometheus_supervisor == "runit"
+      tags: runit
+
+    - role: systemd
+      systemd_service_name: mysqld_exporter
+      systemd_service_user: "{{ mysqld_exporter_user }}"
+      systemd_service_command: "{{ mysqld_exporter_base_dir }}/mysqld_exporter"
+      systemd_service_params: "--config.my-cnf=/home/prometheus/.my.cnf  --{%- set collectors = [] -%} 
+              {%- if mysqld_exporter_collect.auto_increment_columns          and collectors.append('collect.auto_increment.columns '         ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.binlog_size                     and collectors.append('collect.binlog_size '                    ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.engine_innodb_status            and collectors.append('collect.engine_innodb_status '           ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.engine_tokudb_status            and collectors.append('collect.engine_tokudb_status '           ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.global_status                   and collectors.append('collect.global_status '                  ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.global_variables                and collectors.append('collect.global_variables '               ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.clientstats         and collectors.append('collect.info_schema.clientstats '        ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.innodb_metrics      and collectors.append('collect.info_schema.innodb_metrics '     ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.innodb_tablespaces  and collectors.append('collect.info_schema.innodb_tablespaces ' ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.processlist         and collectors.append('collect.info_schema.processlist '        ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.query_response_time and collectors.append('collect.info_schema.query_response_time ') -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.tables              and collectors.append('collect.info_schema.tables '             ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.tablestats          and collectors.append('collect.info_schema.tablestats '         ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.userstats           and collectors.append('collect.info_schema.userstats '          ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventsstatements    and collectors.append('collect.perf_schema.eventsstatements '   ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventswaits         and collectors.append('collect.perf_schema.eventswaits '        ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.file_events         and collectors.append('collect.perf_schema.file_events '        ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.indexiowaits        and collectors.append('collect.perf_schema.indexiowaits '       ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.tableiowaits        and collectors.append('collect.perf_schema.tableiowaits '       ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.tablelocks          and collectors.append('collect.perf_schema.tablelocks '         ) -%}{%- endif -%}
+              {%- if mysqld_exporter_collect.slave_status                    and collectors.append('collect.slave_status '                   ) -%}{%- endif -%}
+              {{ collectors|join(' --') }}
+              {%- if mysqld_exporter_collect.info_schema.tables_databases is defined                       -%} --collect.info_schema.tables.databases=\'{{ mysqld_exporter_collect.info_schema.tables_databases }}\'                                 {%- endif -%}
+              {%- if mysqld_exporter_collect.info_schema.processlist.min_time is defined                   -%} --collect.info_schema.processlist.min_time={{ mysqld_exporter_collect.info_schema.processlist.min_time }}                             {%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventsstatements.digest_text_limit is defined     -%} --collect.perf_schema.eventsstatements.digest_text_limit={{ mysqld_exporter_collect.perf_schema.eventsstatements.digest_text_limit }} {%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventsstatements.limit is defined                 -%} --collect.perf_schema.eventsstatements.limit={{ mysqld_exporter_collect.perf_schema.eventsstatements.limit }}                         {%- endif -%}
+              {%- if mysqld_exporter_collect.perf_schema.eventsstatements.timelimit is defined             -%} --collect.perf_schema.eventsstatements.timelimit={{ mysqld_exporter_collect.perf_schema.eventsstatements.timelimit }}                 {%- endif -%}"
+      when: prometheus_supervisor == "systemd"
